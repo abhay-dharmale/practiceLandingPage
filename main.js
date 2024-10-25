@@ -85,7 +85,6 @@ function animateLoaderOut() {
       "<"
     );
 }
-
 // Start the glitch effect immediately
 glitchEffect();
 
@@ -103,6 +102,7 @@ function closeMenu() {
   });
   document.body.classList.remove("overflow-hidden");
 }
+document.querySelector(".closemenubtn").addEventListener("click", closeMenu);
 
 mobileMenuButton.addEventListener("click", () => {
   gsap.to(mobileMenu, {
