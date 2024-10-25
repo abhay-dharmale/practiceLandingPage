@@ -120,3 +120,72 @@ body {
   filter: blur(8px);
   color: rgba(0, 149, 255, 0.4);
 }
+
+/* navbar */
+
+nav a {
+  transition: all 0.3s ease;
+}
+
+.mobile-menu {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hamburger Menu Animation */
+.hamburger-lines {
+  transition: all 0.3s ease-in-out;
+}
+
+.line {
+  transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.menu-active .line-1 {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menu-active .line-2 {
+  opacity: 0;
+}
+
+.menu-active .line-3 {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Mobile Menu Animation */
+.mobile-menu {
+  clip-path: circle(0px at calc(100% - 32px) 32px);
+  transition: clip-path 0.5s ease-in-out;
+}
+
+.mobile-menu.active {
+  clip-path: circle(150% at calc(100% - 32px) 32px);
+}
+
+/* Menu Item Hover Effect */
+.menu-item {
+  position: relative;
+}
+
+.menu-item::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #f97316;
+  transition: width 0.3s ease;
+}
+
+.menu-item:hover::after {
+  width: 100%;
+}
+
+.mobile-menu button svg {
+  transition: transform 0.3s ease;
+}
+
+.mobile-menu button:hover svg {
+  transform: rotate(90deg);
+}

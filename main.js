@@ -13,16 +13,38 @@ import { FilmPass } from "three/examples/jsm/postprocessing/FilmPass";
 
 // let loaderHeadingArray = [["A", "M", "O", "N", "G", "-", "U", "S"]];
 let loaderHeadingArray = [["W", "A", "L", "L", "-", "E"]];
-document.querySelector(".loaderHeading").textContent = "";
+const loaderHeading = document.querySelector(".loaderHeading");
+loaderHeading.textContent = "";
 
+// Create spans for each letter
 loaderHeadingArray[0].forEach((element) => {
   let span = document.createElement("span");
   span.textContent = element;
-  document.querySelector(".loaderHeading").appendChild(span);
+  loaderHeading.appendChild(span);
 });
+
+// Add loading/glitch effect
+function glitchEffect() {
+  const spans = document.querySelectorAll(".loaderHeading span");
+  spans.forEach((span, index) => {
+    gsap.to(span, {
+      y: gsap.utils.random(-2, 2),
+      opacity: gsap.utils.random(0.7, 1),
+      filter: `blur(${gsap.utils.random(0, 2)}px)`,
+      duration: 0.2,
+      repeat: -1,
+      yoyo: true,
+      ease: "none",
+      delay: index * 0.05,
+    });
+  });
+}
 
 function animateLoaderOut() {
   const tl = gsap.timeline();
+
+  // Kill glitch animations before exit animation
+  gsap.killTweensOf(".loaderHeading span");
 
   // Letter animation
   tl.to(".loaderHeading span", {
@@ -45,26 +67,82 @@ function animateLoaderOut() {
         ease: "expo.inOut",
         onComplete: () => {
           document.querySelector(".loader").style.display = "none";
-          // Remove scroll lock after loader is hidden
           document.body.classList.remove("scroll-lock");
         },
       },
       "-=0.2"
+    )
+    // Subtle bg color transition
+    .fromTo(
+      ".loader",
+      {
+        backgroundColor: "black",
+      },
+      {
+        backgroundColor: "#0a0a0a",
+        duration: 0.8,
+      },
+      "<"
     );
-
-  // Subtle bg color transition
-  tl.fromTo(
-    ".loader",
-    {
-      backgroundColor: "black",
-    },
-    {
-      backgroundColor: "#0a0a0a",
-      duration: 0.8,
-    },
-    "<"
-  );
 }
+
+// Start the glitch effect immediately
+glitchEffect();
+
+// menu
+
+const mobileMenuButton = document.getElementById("mobile-menu-button");
+const mobileMenu = document.getElementById("mobile-menu");
+
+function closeMenu() {
+  gsap.to(mobileMenu, {
+    x: "100%",
+    opacity: 0,
+    duration: 0.5,
+    ease: "power2.inOut",
+  });
+  document.body.classList.remove("overflow-hidden");
+}
+
+mobileMenuButton.addEventListener("click", () => {
+  gsap.to(mobileMenu, {
+    x: "0%",
+    opacity: 1,
+    duration: 0.5,
+    ease: "power2.inOut",
+  });
+  document.body.classList.toggle("overflow-hidden");
+});
+
+// GSAP animation for the loader and navbar items
+window.onload = () => {
+  gsap.to(".loaderHeading", {
+    duration: 1,
+    opacity: 0,
+    y: -50,
+    ease: "power2.inOut",
+    onComplete: () => {
+      document.querySelector(".loader").style.display = "none";
+    },
+  });
+
+  gsap.from(".walle-text", {
+    duration: 1,
+    y: 50,
+    opacity: 0,
+    ease: "power2.out",
+    delay: 0.5,
+  });
+
+  gsap.from("nav a", {
+    duration: 0.6,
+    y: -20,
+    opacity: 0,
+    stagger: 0.2,
+    ease: "power2.out",
+    delay: 1,
+  });
+};
 
 // Create a scene
 const scene = new THREE.Scene();
@@ -99,13 +177,18 @@ const filmPass = new FilmPass(0.55, 0.25, 648, false);
 composer.addPass(filmPass);
 
 //hdr loader
+let modelLoaded = false;
+let textureLoaded = false;
+
+//hdr loader
 const rgbeLoader = new RGBELoader();
 rgbeLoader.load(
   "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/shanghai_bund_2k.hdr",
   (texture) => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = texture;
-    // scene.background = texture;
+    textureLoaded = true;
+    checkAllAssetsLoaded();
   }
 );
 
@@ -124,9 +207,16 @@ loader.load("/walle.glb", (gltf) => {
   model.position.set(0, -0.4, 0);
   model.scale.set(1, 1, 1);
 
-  // slight delay before starting the exit animation
-  setTimeout(animateLoaderOut, 900);
+  modelLoaded = true;
+  checkAllAssetsLoaded();
 });
+
+function checkAllAssetsLoaded() {
+  if (modelLoaded && textureLoaded) {
+    // Add a small delay to ensure everything is rendered properly
+    setTimeout(animateLoaderOut, 500);
+  }
+}
 
 window.addEventListener("mousemove", (e) => {
   if (model) {
