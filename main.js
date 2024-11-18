@@ -5,13 +5,13 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import gsap from "gsap";
 
-//postprocessing
+// Postprocessing
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { FilmPass } from "three/examples/jsm/postprocessing/FilmPass";
 
-// let loaderHeadingArray = [["A", "M", "O", "N", "G", "-", "U", "S"]];
+// Heading Array
 let loaderHeadingArray = [["W", "A", "L", "L", "-", "E"]];
 const loaderHeading = document.querySelector(".loaderHeading");
 loaderHeading.textContent = "";
@@ -85,11 +85,11 @@ function animateLoaderOut() {
       "<"
     );
 }
+
 // Start the glitch effect immediately
 glitchEffect();
 
-// menu
-
+// menu functionality
 const mobileMenuButton = document.getElementById("mobile-menu-button");
 const mobileMenu = document.getElementById("mobile-menu");
 
@@ -102,8 +102,10 @@ function closeMenu() {
   });
   document.body.classList.remove("overflow-hidden");
 }
+
 document.querySelector(".closemenubtn").addEventListener("click", closeMenu);
 
+// Ensure the mobile menu button triggers the opening of the menu
 mobileMenuButton.addEventListener("click", () => {
   gsap.to(mobileMenu, {
     x: "0%",
@@ -142,6 +144,11 @@ window.onload = () => {
     ease: "power2.out",
     delay: 1,
   });
+
+  // Animate loader out after 5 seconds (fixed duration)
+  setTimeout(() => {
+    animateLoaderOut(); // Animate the loader out after 5 seconds
+  }, 5000);
 };
 
 // Create a scene
@@ -176,11 +183,11 @@ composer.addPass(bloomPass);
 const filmPass = new FilmPass(0.55, 0.25, 648, false);
 composer.addPass(filmPass);
 
-//hdr loader
+// hdr loader
 let modelLoaded = false;
 let textureLoaded = false;
 
-//hdr loader
+// hdr loader
 const rgbeLoader = new RGBELoader();
 rgbeLoader.load(
   "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/shanghai_bund_2k.hdr",
@@ -188,11 +195,11 @@ rgbeLoader.load(
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = texture;
     textureLoaded = true;
-    checkAllAssetsLoaded();
+    // Assets are loaded, but no longer waiting for them to finish before animating loader
   }
 );
 
-//model loader
+// model loader
 const loader = new GLTFLoader();
 let model;
 
@@ -208,15 +215,8 @@ loader.load("/walle.glb", (gltf) => {
   model.scale.set(1, 1, 1);
 
   modelLoaded = true;
-  checkAllAssetsLoaded();
+  // Model is loaded, but we're not relying on this to trigger the loader exit
 });
-
-function checkAllAssetsLoaded() {
-  if (modelLoaded && textureLoaded) {
-    // Add a small delay to ensure everything is rendered properly
-    setTimeout(animateLoaderOut, 500);
-  }
-}
 
 window.addEventListener("mousemove", (e) => {
   if (model) {
